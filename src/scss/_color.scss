@@ -1,0 +1,26 @@
+$primary-one: #575454;
+$secondary-one: #306bd9;
+$tertiary-one: #ffee06;
+
+.text-primary-one {
+	color: $primary-one;
+}
+.text-secondary-one {
+	color: $secondary-one;
+}
+.text-tertiary-one {
+	color: $tertiary-one;
+}
+
+.bg-none {
+	background-color: none;
+}
+.bg-primary-one {
+	background-color: $primary-one;
+}
+.bg-secondary-one {
+	background-color: $secondary-one;
+}
+.bg-tertiary-one {
+	background-color: $tertiary-one;
+}
