@@ -5,10 +5,9 @@ export const authorizeUser = () => {
 
 export const getChatClear = () => {
   const currentUser: any = window.localStorage.getItem("user");
+  const chatClearValue = Number(JSON.parse(currentUser).chatClear);
   const chatClear = currentUser
-    ? Math.floor(
-        300000 + Number(JSON.parse(currentUser).chatClear - Date.now()) / 1000
-      ) % 300
+    ? Math.floor((chatClearValue + 300000 - Date.now()) / 1000) % 300
     : 0;
   return chatClear;
 };

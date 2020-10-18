@@ -52,7 +52,6 @@ export default class Navbar extends React.Component<Props, State> {
   }
 
   initializeAutoLogout = () => {
-    console.log("moved");
     this.autoLogout = setTimeout(() => {
       console.log("logged out");
       this.logout();

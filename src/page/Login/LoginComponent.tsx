@@ -74,11 +74,11 @@ export default class Login extends React.Component<Props, State> {
   };
 
   render() {
-    const { errorMessage , formDetail, loginInterface} = this.state;
+    const { errorMessage, formDetail, loginInterface } = this.state;
 
     return (
       <div className="d-flex flex-fill h-100 flex-column justify-content-center align-items-center">
-        <Form autoComplete='off'>
+        <Form autoComplete="off">
           <Form.Group controlId="formBasicEmail">
             <Form.Label>Username</Form.Label>
             <Form.Control
@@ -86,7 +86,7 @@ export default class Login extends React.Component<Props, State> {
               value={formDetail.username}
               onChange={(e) => this.updateForm("username", e.target.value)}
               placeholder="Enter username"
-              autoComplete='off'
+              autoComplete="off"
             />
           </Form.Group>
           <Form.Group controlId="formBasicPassword">
@@ -96,7 +96,7 @@ export default class Login extends React.Component<Props, State> {
               value={formDetail.password}
               onChange={(e) => this.updateForm("password", e.target.value)}
               placeholder="Password"
-              autoComplete='off'
+              autoComplete="off"
             />
           </Form.Group>
           <div
@@ -109,15 +109,14 @@ export default class Login extends React.Component<Props, State> {
             variant="primary"
             className="mt-4 w-100 cursor-pointer"
             type="button"
-            onClick={() => loginInterface ? this.signIn() : this.signUp()}
+            onClick={() => (loginInterface ? this.signIn() : this.signUp())}
           >
             {loginInterface ? "Sign In" : "Sign Up"}
           </Button>
-          <div
-            className="w-100 mt-2 text-center text-muted fs-12 cursor-pointer"
-            onClick={this.toggle}
-          >
-            {loginInterface ? "Sign Up" : "Sign In"}
+          <div className="w-100 mt-2 py-2 text-center text-muted fs-12 cursor-pointer">
+            <span onClick={this.toggle}>
+              {loginInterface ? "Sign Up" : "Sign In"}
+            </span>
           </div>
         </Form>
       </div>
