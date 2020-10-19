@@ -3,7 +3,7 @@ import Axios from "axios";
 import { Button, Form } from "react-bootstrap";
 import { Props, State } from "./LoginModel";
 import { API } from "config";
-import { getChatClear, resetLs, setLs } from "util/CrossUtil";
+import { resetLs, setLs } from "util/CrossUtil";
 
 export default class Login extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -90,7 +90,7 @@ export default class Login extends React.Component<Props, State> {
             &nbsp;{errorMessage}&nbsp;
           </div>
           <Button
-            variant="primary"
+            variant="info"
             className="mt-4 w-100 cursor-pointer"
             type="button"
             onClick={() => this.signInOrSignUp(loginInterface)}

@@ -3,5 +3,5 @@ export interface Props {
 }
 
 export interface State {
-  timeLeftToRefresh: number
+  refreshingData: boolean
 }

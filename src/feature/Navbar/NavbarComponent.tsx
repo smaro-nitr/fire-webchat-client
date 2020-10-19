@@ -1,15 +1,10 @@
 import React from "react";
 import Axios from "axios";
+import socketIOClient from "socket.io-client";
 import BsNavbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import { Props, State } from "./NavbarModel";
-import {
-  authorizeUser,
-  getChatClear,
-  getReadbleTime,
-  getUserLs,
-  setLs,
-} from "util/CrossUtil";
+import { authorizeUser, getUserLs, setLs } from "util/CrossUtil";
 import { API } from "config";
 
 export default class Navbar extends React.Component<Props, State> {
@@ -17,11 +12,12 @@ export default class Navbar extends React.Component<Props, State> {
 
   timer: any;
   autoLogout: any;
+  socket: any;
 
   constructor(props: Props) {
     super(props);
     this.state = {
-      timeLeftToRefresh: getChatClear(),
+      refreshingData: false,
     };
   }
 
@@ -44,15 +40,16 @@ export default class Navbar extends React.Component<Props, State> {
     });
 
     this.initializeAutoLogout();
-    let timeLeftToRefresh = getChatClear();
 
-    this.timer = setInterval(() => {
-      timeLeftToRefresh -= 1;
-      if (timeLeftToRefresh < 0) timeLeftToRefresh = 300;
-      this.setState({ timeLeftToRefresh }, () =>
-        setLs("chatClear", timeLeftToRefresh.toString())
-      );
-    }, 1000);
+    this.socket = socketIOClient(API.websocket);
+    this.socket.on("child_added", (data: any) => {
+      if (data.message === getUserLs().defaultParam.clearTimeMessage) {
+        this.setState({ refreshingData: true });
+      }
+    });
+    this.socket.on("child_removed", (data: any) => {
+      this.setState({ refreshingData: false });
+    });
   };
 
   componentWillUnmount() {
@@ -66,40 +63,40 @@ export default class Navbar extends React.Component<Props, State> {
   };
 
   logout = () => {
-    // const { history } = this.props;
+    const { history } = this.props;
     Axios.post(`${API.backend}/chat-sign-out`, {
       username: getUserLs().username,
     }).then((response) => {
       setLs("user", "");
       setLs("chatWith", "");
+      history.push("/");
       window.location.replace("https://www.youtube.com/");
-      // history.push("/");
     });
   };
 
   render() {
     const { history } = this.props;
-    const { timeLeftToRefresh } = this.state;
+    const { refreshingData } = this.state;
 
     return (
       <BsNavbar
         sticky="top"
         expand="lg"
         variant="dark"
-        className="w-100 bg-success"
+        className="w-100 bg-info"
       >
         <BsNavbar.Brand
           id="brand-title"
-          className="font-weight-bold"
+          className="font-weight-bold text-white"
           onClick={() => history.push("/contact")}
         >
           Fire Webchat
+          {refreshingData && (
+            <i className="mx-2 fas fa-spinner fa-spin text-warning"></i>
+          )}
         </BsNavbar.Brand>
         <Nav className="ml-auto">
           <Nav.Link href="#">
-            <span className="text-white">
-              {getReadbleTime(timeLeftToRefresh)}
-            </span>
             <i
               className="fas fa-power-off pl-3"
               title="logout"

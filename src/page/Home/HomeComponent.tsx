@@ -99,7 +99,7 @@ export default class Home extends React.Component<Props, State> {
                     <span
                       className={`small font-weight-bold ${
                         e.sender === currentUser.username
-                          ? "text-success"
+                          ? "text-info"
                           : "text-primary"
                       }`}
                     >
@@ -127,7 +127,7 @@ export default class Home extends React.Component<Props, State> {
                 onChange={(e) => this.setMessage(e.target.value)}
               />
               <InputGroup.Append>
-                <Button variant="outline-success" onClick={this.sendMessage}>
+                <Button variant="outline-info" onClick={this.sendMessage}>
                   Send
                 </Button>
               </InputGroup.Append>
