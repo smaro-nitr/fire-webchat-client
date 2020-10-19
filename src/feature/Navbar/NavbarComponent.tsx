@@ -3,7 +3,13 @@ import Axios from "axios";
 import BsNavbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import { Props, State } from "./NavbarModel";
-import { authorizeUser, getChatClear, getReadbleTime } from "util/CrossUtil";
+import {
+  authorizeUser,
+  getChatClear,
+  getReadbleTime,
+  getUserLs,
+  setLs,
+} from "util/CrossUtil";
 import { API } from "config";
 
 export default class Navbar extends React.Component<Props, State> {
@@ -38,12 +44,14 @@ export default class Navbar extends React.Component<Props, State> {
     });
 
     this.initializeAutoLogout();
+    let timeLeftToRefresh = getChatClear();
 
-    let timeLeftToRefresh = this.state.timeLeftToRefresh;
     this.timer = setInterval(() => {
       timeLeftToRefresh -= 1;
       if (timeLeftToRefresh < 0) timeLeftToRefresh = 300;
-      this.setState({ timeLeftToRefresh });
+      this.setState({ timeLeftToRefresh }, () =>
+        setLs("chatClear", timeLeftToRefresh.toString())
+      );
     }, 1000);
   };
 
@@ -53,20 +61,19 @@ export default class Navbar extends React.Component<Props, State> {
 
   initializeAutoLogout = () => {
     this.autoLogout = setTimeout(() => {
-      console.log("logged out");
       this.logout();
     }, 180000);
   };
 
   logout = () => {
-    const { history } = this.props;
-    const currentUser: any = window.localStorage.getItem("user");
+    // const { history } = this.props;
     Axios.post(`${API.backend}/chat-sign-out`, {
-      username: JSON.parse(currentUser).username,
+      username: getUserLs().username,
     }).then((response) => {
-      window.localStorage.setItem("user", "");
-      window.localStorage.setItem("chatWith", "");
-      history.push("/");
+      setLs("user", "");
+      setLs("chatWith", "");
+      window.location.replace("https://www.youtube.com/");
+      // history.push("/");
     });
   };
 
@@ -90,7 +97,9 @@ export default class Navbar extends React.Component<Props, State> {
         </BsNavbar.Brand>
         <Nav className="ml-auto">
           <Nav.Link href="#">
-            <span className='text-white'>{getReadbleTime(timeLeftToRefresh)}</span>
+            <span className="text-white">
+              {getReadbleTime(timeLeftToRefresh)}
+            </span>
             <i
               className="fas fa-power-off pl-3"
               title="logout"

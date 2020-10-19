@@ -4,9 +4,11 @@ import socketIOClient from "socket.io-client";
 import { Props, State } from "./HomeModel";
 import { Button, FormControl, InputGroup, Navbar } from "react-bootstrap";
 import { API } from "config";
+import { getLs, getUserLs } from "util/CrossUtil";
 
 export default class Home extends React.Component<Props, State> {
   showNotification: any;
+  socket: any;
 
   constructor(props: Props) {
     super(props);
@@ -25,13 +27,12 @@ export default class Home extends React.Component<Props, State> {
       this.showNotification = false;
     });
 
-    const socket = socketIOClient(API.websocket);
-    socket.on("child_added", (data: any) => {
-      const currentUser: any = window.localStorage.getItem("user");
-      const reciever = window.localStorage.getItem("chatWith");
+    this.socket = socketIOClient(API.websocket);
+    this.socket.on("child_added", (data: any) => {
+      const reciever = getLs("chatWith");
       const chatData = JSON.parse(JSON.stringify(this.state.chatData));
 
-      const sender = JSON.parse(currentUser).username;
+      const sender = getUserLs().username;
       const validSender = data.sender === sender || data.sender === reciever;
       const validReciever =
         data.reciever === sender || data.reciever === reciever;
@@ -42,15 +43,20 @@ export default class Home extends React.Component<Props, State> {
           const bottomEl: any = document.getElementById("bottom");
           bottomEl && bottomEl.scrollIntoView();
 
-          if (this.showNotification)
+          if (this.showNotification) {
             new Notification(`Hi ${sender}`, { body: "New Message Arrived" });
+          }
         });
       }
     });
 
-    socket.on("child_removed", (data: any) => {
+    this.socket.on("child_removed", (data: any) => {
       this.setState({ chatData: [] });
     });
+  }
+
+  componentWillUnmount() {
+    this.socket.close();
   }
 
   setMessage = (message: string) => {
@@ -59,12 +65,10 @@ export default class Home extends React.Component<Props, State> {
 
   sendMessage = () => {
     const { message } = this.state;
-    const currentUser: any = window.localStorage.getItem("user");
-    const reciever = window.localStorage.getItem("chatWith");
     message &&
       Axios.post(`${API.backend}/chat-send-message`, {
-        sender: JSON.parse(currentUser).username,
-        reciever,
+        sender: getUserLs().username,
+        reciever: getLs("chatWith"),
         message,
       }).then((response) => {
         this.setState({ message: "" });
@@ -73,7 +77,7 @@ export default class Home extends React.Component<Props, State> {
 
   render() {
     const { chatData, message } = this.state;
-    const currentUser: any = window.localStorage.getItem("user");
+    const currentUser = getUserLs();
 
     return (
       <>
@@ -84,7 +88,7 @@ export default class Home extends React.Component<Props, State> {
                 <div
                   key={index.toString()}
                   className={`${
-                    e.sender === JSON.parse(currentUser).username
+                    e.sender === currentUser.username
                       ? "text-right"
                       : "text-left"
                   }`}
@@ -94,7 +98,7 @@ export default class Home extends React.Component<Props, State> {
                     : true) && (
                     <span
                       className={`small font-weight-bold ${
-                        e.sender === JSON.parse(currentUser).username
+                        e.sender === currentUser.username
                           ? "text-success"
                           : "text-primary"
                       }`}

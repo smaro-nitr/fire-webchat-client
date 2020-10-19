@@ -3,6 +3,7 @@ import Axios from "axios";
 import { Button, Form } from "react-bootstrap";
 import { Props, State } from "./LoginModel";
 import { API } from "config";
+import { getChatClear, resetLs, setLs } from "util/CrossUtil";
 
 export default class Login extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -18,7 +19,7 @@ export default class Login extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    window.localStorage.setItem("user", "");
+    resetLs();
   }
 
   toggle = () => {
@@ -39,35 +40,18 @@ export default class Login extends React.Component<Props, State> {
     this.setState({ formDetail, errorMessage: "" });
   };
 
-  signIn = () => {
+  signInOrSignUp = (signIn: boolean) => {
     const { history } = this.props;
     const { formDetail } = this.state;
 
-    Axios.post(`${API.backend}/chat-sign-in`, {
+    Axios.post(`${API.backend}/${signIn ? 'chat-sign-in' : 'chat-sign-up'}`, {
       username: formDetail.username,
       password: formDetail.password,
     }).then((response) => {
       if (response.data.status === 300) {
         this.setState({ errorMessage: response.data.message });
       } else {
-        window.localStorage.setItem("user", response.data.message);
-        history.push("/contact");
-      }
-    });
-  };
-
-  signUp = () => {
-    const { history } = this.props;
-    const { formDetail } = this.state;
-
-    Axios.post(`${API.backend}/chat-sign-up`, {
-      username: formDetail.username,
-      password: formDetail.password,
-    }).then((response) => {
-      if (response.data.status === 300) {
-        this.setState({ errorMessage: response.data.message });
-      } else {
-        window.localStorage.setItem("user", response.data.message);
+        setLs("user", response.data.message);
         history.push("/contact");
       }
     });
@@ -109,11 +93,11 @@ export default class Login extends React.Component<Props, State> {
             variant="primary"
             className="mt-4 w-100 cursor-pointer"
             type="button"
-            onClick={() => (loginInterface ? this.signIn() : this.signUp())}
+            onClick={() => this.signInOrSignUp(loginInterface)}
           >
             {loginInterface ? "Sign In" : "Sign Up"}
           </Button>
-          <div className="w-100 mt-2 py-2 text-center text-muted fs-12 cursor-pointer">
+          <div className="w-100 mt-4 text-center text-muted fs-12 cursor-pointer">
             <span onClick={this.toggle}>
               {loginInterface ? "Sign Up" : "Sign In"}
             </span>

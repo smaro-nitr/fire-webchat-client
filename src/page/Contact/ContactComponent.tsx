@@ -2,6 +2,7 @@ import React from "react";
 import Axios from "axios";
 import { Props, State } from "./ContactModel";
 import { API } from "config";
+import { getUserLs, setLs } from "util/CrossUtil";
 
 export default class Contact extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -12,7 +13,7 @@ export default class Contact extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    window.localStorage.setItem("chatWith", "");
+    setLs("chatWith", "");
     Axios.get(`${API.backend}/chat-user`).then((response) => {
       this.setState({ user: response.data.message });
     });
@@ -20,19 +21,19 @@ export default class Contact extends React.Component<Props, State> {
 
   startChat = (chatWith: string) => {
     const { history } = this.props;
-    window.localStorage.setItem("chatWith", chatWith);
+    setLs("chatWith", chatWith);
     history.push("/home");
   };
 
   render() {
     const { user } = this.state;
-    const currentUser: any = window.localStorage.getItem("user");
+    const currentUser = getUserLs();
 
     return (
       <div className="d-flex flex-column flex-fill px-3 my-2 overflow-auto">
-          <div> Hi {JSON.parse(currentUser).username}, Wanna chat with .... <br/><br/></div>
+          <div> Hi {currentUser.username}, Wanna chat with .... <br/><br/></div>
           {user.map((e) => {
-            if (e.username === JSON.parse(currentUser).username) return null;
+            if (e.username === currentUser.username) return null;
             return (
               <div
                 key={e.username}
