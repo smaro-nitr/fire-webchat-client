@@ -3,13 +3,18 @@
 }
 
 .navbar-nav a.active-menu {
-  color: rgb(237, 252, 35) !important;
+  color: rgb(0, 255, 255) !important;
 }
 
-.nav-link:hover, .fa-arrow-left:hover {
-  color: #fcf803 !important;
+.nav-link:hover,
+.fa-arrow-left:hover {
+  color: rgb(0, 255, 255) !important;
+}
+
+.shadow {
+  text-shadow: 0px 0px 5px #FFF, 0 0 5px #FFF, 0 0 5px #FFF;
 }
 
 .text-white:hover {
-  color: #FFF !important;
+  color: #fff !important;
 }

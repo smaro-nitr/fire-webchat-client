@@ -3,5 +3,6 @@ export interface Props {
 }
 
 export interface State {
+  activeChat: boolean
   refreshingData: boolean
 }

@@ -28,9 +28,8 @@ export default class Home extends React.Component<Props, State> {
     });
 
     this.socket = socketIOClient(API.websocket);
-    this.socket.on("child_added", (data: any) => {
+    this.socket.on("message_added", (data: any) => {
       const reciever = getLs("chatWith");
-      const chatData = JSON.parse(JSON.stringify(this.state.chatData));
 
       const sender = getUserLs().username;
       const validSender = data.sender === sender || data.sender === reciever;
@@ -38,6 +37,7 @@ export default class Home extends React.Component<Props, State> {
         data.reciever === sender || data.reciever === reciever;
 
       if (validSender && validReciever) {
+        const chatData = JSON.parse(JSON.stringify(this.state.chatData));
         chatData.push(data);
         this.setState({ chatData }, () => {
           document.getElementById("bottom")?.scrollIntoView();
@@ -49,7 +49,7 @@ export default class Home extends React.Component<Props, State> {
       }
     });
 
-    this.socket.on("child_removed", (data: any) => {
+    this.socket.on("message_removed", (data: any) => {
       this.setState({ chatData: [] });
     });
   }
@@ -132,7 +132,7 @@ export default class Home extends React.Component<Props, State> {
               <InputGroup.Append>
                 <Button
                   variant="outline-info"
-                  onClick={e => {
+                  onClick={(e) => {
                     e.preventDefault();
                     this.sendMessage();
                   }}

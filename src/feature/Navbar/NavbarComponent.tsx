@@ -17,6 +17,7 @@ export default class Navbar extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
+      activeChat: false,
       refreshingData: false,
     };
   }
@@ -46,13 +47,27 @@ export default class Navbar extends React.Component<Props, State> {
     this.initializeAutoLogout();
 
     this.socket = socketIOClient(API.websocket);
-    this.socket.on("child_added", (data: any) => {
+
+    this.socket.on("message_added", (data: any) => {
       if (data.message === getUserLs().defaultParam.clearTimeMessage) {
         this.setState({ refreshingData: true });
       }
     });
-    this.socket.on("child_removed", (data: any) => {
+
+    this.socket.on("message_removed", (data: any) => {
       this.setState({ refreshingData: false });
+    });
+
+    this.socket.on("user_added", (data: any) => {
+      if (data.username === getLs("chatWith")) {
+        this.setState({ activeChat: data.loggedIn });
+      }
+    });
+
+    this.socket.on("user_updated", (data: any) => {
+      if (data.username === getLs("chatWith")) {
+        this.setState({ activeChat: data.loggedIn });
+      }
     });
   };
 
@@ -84,7 +99,7 @@ export default class Navbar extends React.Component<Props, State> {
 
   render() {
     const { history } = this.props;
-    const { refreshingData } = this.state;
+    const { activeChat, refreshingData } = this.state;
 
     const chatWith = getLs("chatWith");
 
@@ -99,8 +114,8 @@ export default class Navbar extends React.Component<Props, State> {
           id="brand-title"
           className="font-weight-bold text-white"
         >
-          {chatWith ? (
-            <>
+          <>
+            {chatWith && (
               <i
                 onClick={() => {
                   setLs("chatWith", "");
@@ -108,14 +123,19 @@ export default class Navbar extends React.Component<Props, State> {
                 }}
                 className="mr-3 fas fa-arrow-left"
               ></i>
-              {chatWith}
-            </>
-          ) : (
-            "Fire Webchat"
-          )}
-          {refreshingData && (
-            <i className="mx-2 fas fa-spinner fa-spin text-warning"></i>
-          )}
+            )}
+            {chatWith ? chatWith : "Fire Webchat"}
+            {refreshingData && (
+              <i className="ml-2 fas fa-spinner fa-spin text-white"></i>
+            )}
+            {chatWith && !refreshingData && (
+              <i
+                className={`ml-2 fas fa-circle shadow ${
+                  activeChat ? "text-success" : "text-warning"
+                }`}
+              ></i>
+            )}
+          </>
         </BsNavbar.Brand>
         <Nav className="ml-auto">
           <Nav.Link href="#">
