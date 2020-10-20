@@ -18,4 +18,16 @@ ReactDOM.render(
   document.getElementById("root")
 );
 
-serviceWorker.register();
+serviceWorker.register({
+  onUpdate: (serviceWorkerRegistration) => {
+    const registrationWaiting = serviceWorkerRegistration.waiting;
+    console.log(registrationWaiting)
+    if (registrationWaiting) {
+      registrationWaiting.addEventListener("statechange", (e: any) => {
+        if (e.target.state === "activated") {
+          window.location.reload();
+        }
+      });
+    }
+  },
+});

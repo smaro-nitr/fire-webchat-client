@@ -35,9 +35,13 @@ export default class Navbar extends React.Component<Props, State> {
       this.logout();
     });
 
-    Notification.requestPermission().then((result) => {
-      console.log(result);
+    window.addEventListener("blur", () => {
+      history.push("/");
     });
+
+    // Notification.requestPermission().then((result) => {
+    //   console.log(result);
+    // });
 
     this.initializeAutoLogout();
 
@@ -62,7 +66,7 @@ export default class Navbar extends React.Component<Props, State> {
     }, 180000);
   };
 
-  logout = () => {
+  logout = (exit?: boolean) => {
     const { history } = this.props;
     Axios.post(`${API.backend}/chat-sign-out`, {
       username: getUserLs().username,
@@ -70,9 +74,13 @@ export default class Navbar extends React.Component<Props, State> {
       setLs("user", "");
       setLs("chatWith", "");
       history.push("/");
-      window.location.replace("https://www.youtube.com/");
+      if(exit) window.location.replace("https://www.youtube.com/"); 
     });
   };
+
+  exit = () => {
+    this.logout(true)
+  }
 
   render() {
     const { history } = this.props;
@@ -100,7 +108,7 @@ export default class Navbar extends React.Component<Props, State> {
             <i
               className="fas fa-power-off pl-3"
               title="logout"
-              onClick={this.logout}
+              onClick={this.exit}
             ></i>
           </Nav.Link>
         </Nav>

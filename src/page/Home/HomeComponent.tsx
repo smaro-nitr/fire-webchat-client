@@ -44,7 +44,7 @@ export default class Home extends React.Component<Props, State> {
           bottomEl && bottomEl.scrollIntoView();
 
           if (this.showNotification) {
-            new Notification(`Hi ${sender}`, { body: "New Message Arrived" });
+            // new Notification(`Hi ${sender}`, { body: "New Message Arrived" });
           }
         });
       }

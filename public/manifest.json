@@ -1,6 +1,7 @@
 {
-  "short_name": "Connect",
-  "name": "Connect",
+  "short_name": "HooK",
+  "name": "HooK",
+  "display": "fullscreen",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +21,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#28a745",
+  "theme_color": "#17a2b8",
   "background_color": "#ffffff"
 }

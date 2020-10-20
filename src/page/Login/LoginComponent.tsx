@@ -1,6 +1,7 @@
 import React from "react";
 import Axios from "axios";
-import { Button, Form } from "react-bootstrap";
+import md5 from "md5";
+import { Button, Form, FormControl, InputGroup } from "react-bootstrap";
 import { Props, State } from "./LoginModel";
 import { API } from "config";
 import { resetLs, setLs } from "util/CrossUtil";
@@ -22,18 +23,6 @@ export default class Login extends React.Component<Props, State> {
     resetLs();
   }
 
-  toggle = () => {
-    this.setState((prevState) => {
-      return {
-        loginInterface: !prevState.loginInterface,
-        formDetail: {
-          username: "",
-          password: "",
-        },
-      };
-    });
-  };
-
   updateForm = (key: string, value: string) => {
     const formDetail = JSON.parse(JSON.stringify(this.state.formDetail));
     formDetail[key] = value;
@@ -44,7 +33,7 @@ export default class Login extends React.Component<Props, State> {
     const { history } = this.props;
     const { formDetail } = this.state;
 
-    Axios.post(`${API.backend}/${signIn ? 'chat-sign-in' : 'chat-sign-up'}`, {
+    Axios.post(`${API.backend}/${signIn ? "chat-sign-in" : "chat-sign-up"}`, {
       username: formDetail.username,
       password: formDetail.password,
     }).then((response) => {
@@ -54,6 +43,18 @@ export default class Login extends React.Component<Props, State> {
         setLs("user", response.data.message);
         history.push("/contact");
       }
+    });
+  };
+
+  enableSignUp = () => {
+    const secretCode: any = document.getElementById("secret-code");
+    this.setState({
+      formDetail: {
+        username: "",
+        password: "",
+      },
+      loginInterface:
+        md5(secretCode.value) !== "fb9abce118c6f8c034ec673f9f447870",
     });
   };
 
@@ -83,10 +84,7 @@ export default class Login extends React.Component<Props, State> {
               autoComplete="off"
             />
           </Form.Group>
-          <div
-            className="w-100 my-2 text-center text-danger fs-12"
-            onClick={this.toggle}
-          >
+          <div className="w-100 my-2 text-center text-danger fs-12">
             &nbsp;{errorMessage}&nbsp;
           </div>
           <Button
@@ -97,10 +95,19 @@ export default class Login extends React.Component<Props, State> {
           >
             {loginInterface ? "Sign In" : "Sign Up"}
           </Button>
-          <div className="w-100 mt-4 text-center text-muted fs-12 cursor-pointer">
-            <span onClick={this.toggle}>
-              {loginInterface ? "Sign Up" : "Sign In"}
-            </span>
+          <div className="w-100 mt-4 text-center text-muted fs-12">
+            <InputGroup className="mb-3">
+              <FormControl
+                type="password"
+                id="secret-code"
+                placeholder="Referral"
+              />
+              <InputGroup.Append onClick={this.enableSignUp}>
+                <InputGroup.Text>
+                  <i className="fas fa-unlock-alt"></i>
+                </InputGroup.Text>
+              </InputGroup.Append>
+            </InputGroup>
           </div>
         </Form>
       </div>
