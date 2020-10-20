@@ -40,8 +40,7 @@ export default class Home extends React.Component<Props, State> {
       if (validSender && validReciever) {
         chatData.push(data);
         this.setState({ chatData }, () => {
-          const bottomEl: any = document.getElementById("bottom");
-          bottomEl && bottomEl.scrollIntoView();
+          document.getElementById("bottom")?.scrollIntoView();
 
           if (this.showNotification) {
             // new Notification(`Hi ${sender}`, { body: "New Message Arrived" });
@@ -65,13 +64,16 @@ export default class Home extends React.Component<Props, State> {
 
   sendMessage = () => {
     const { message } = this.state;
+    document.getElementById("text-message")?.focus();
     message &&
       Axios.post(`${API.backend}/chat-send-message`, {
         sender: getUserLs().username,
         reciever: getLs("chatWith"),
         message,
       }).then((response) => {
-        this.setState({ message: "" });
+        this.setState({ message: "" }, () => {
+          document.getElementById("bottom")?.scrollIntoView();
+        });
       });
   };
 
@@ -122,12 +124,19 @@ export default class Home extends React.Component<Props, State> {
           <Navbar bg="light" variant="light" fixed="bottom">
             <InputGroup className="">
               <FormControl
+                id="text-message"
                 value={message}
                 placeholder="Type your msg here ..."
                 onChange={(e) => this.setMessage(e.target.value)}
               />
               <InputGroup.Append>
-                <Button variant="outline-info" onClick={this.sendMessage}>
+                <Button
+                  variant="outline-info"
+                  onClick={e => {
+                    e.preventDefault();
+                    this.sendMessage();
+                  }}
+                >
                   Send
                 </Button>
               </InputGroup.Append>

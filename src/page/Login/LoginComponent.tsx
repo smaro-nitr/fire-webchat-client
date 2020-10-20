@@ -85,7 +85,7 @@ export default class Login extends React.Component<Props, State> {
             />
           </Form.Group>
           <div className="w-100 my-2 text-center text-danger fs-12">
-            &nbsp;{errorMessage}&nbsp;
+            {errorMessage ? errorMessage : API.version}
           </div>
           <Button
             variant="info"

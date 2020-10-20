@@ -37,14 +37,14 @@ export default class Contact extends React.Component<Props, State> {
             return (
               <div
                 key={e.username}
-                className="d-flex flex-row small py-2 border-bottom"
+                className="d-flex flex-row small py-2 border-bottom cursor-pointer"
                 onClick={() => this.startChat(e.username)}
               >
                 <div className="font-weight-bold">
-                  <i className="far fa-comments"></i> {e.username}
+                  <i className={`fas fa-circle ${e.loggedIn ? 'text-success' : 'text-warning'}`}></i> {e.username} 
                 </div>
                 <div className="ml-auto text-muted">
-                  <i className="far fa-clock"></i> {e.lastLogin}
+                  <i className="fas fa-eye mx-2"></i> {e.lastLogin}
                 </div>
               </div>
             );

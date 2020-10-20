@@ -4,7 +4,7 @@ import socketIOClient from "socket.io-client";
 import BsNavbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import { Props, State } from "./NavbarModel";
-import { authorizeUser, getUserLs, setLs } from "util/CrossUtil";
+import { authorizeUser, getLs, getUserLs, setLs } from "util/CrossUtil";
 import { API } from "config";
 
 export default class Navbar extends React.Component<Props, State> {
@@ -36,7 +36,7 @@ export default class Navbar extends React.Component<Props, State> {
     });
 
     window.addEventListener("blur", () => {
-      history.push("/");
+      this.logout();
     });
 
     // Notification.requestPermission().then((result) => {
@@ -74,17 +74,19 @@ export default class Navbar extends React.Component<Props, State> {
       setLs("user", "");
       setLs("chatWith", "");
       history.push("/");
-      if(exit) window.location.replace("https://www.youtube.com/"); 
+      if (exit) window.location.replace("https://www.youtube.com/");
     });
   };
 
   exit = () => {
-    this.logout(true)
-  }
+    this.logout(true);
+  };
 
   render() {
     const { history } = this.props;
     const { refreshingData } = this.state;
+
+    const chatWith = getLs("chatWith");
 
     return (
       <BsNavbar
@@ -96,9 +98,21 @@ export default class Navbar extends React.Component<Props, State> {
         <BsNavbar.Brand
           id="brand-title"
           className="font-weight-bold text-white"
-          onClick={() => history.push("/contact")}
         >
-          Fire Webchat
+          {chatWith ? (
+            <>
+              <i
+                onClick={() => {
+                  setLs("chatWith", "");
+                  history.push("/contact");
+                }}
+                className="mr-3 fas fa-arrow-left"
+              ></i>
+              {chatWith}
+            </>
+          ) : (
+            "Fire Webchat"
+          )}
           {refreshingData && (
             <i className="mx-2 fas fa-spinner fa-spin text-warning"></i>
           )}
