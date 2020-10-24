@@ -90,8 +90,11 @@ export default class Login extends React.Component<Props, State> {
           <Button
             variant="info"
             className="mt-4 w-100 cursor-pointer"
-            type="button"
-            onClick={() => this.signInOrSignUp(loginInterface)}
+            type="submit"
+            onClick={(e) => {
+              e.preventDefault();
+              this.signInOrSignUp(loginInterface);
+            }}
           >
             {loginInterface ? "Sign In" : "Sign Up"}
           </Button>

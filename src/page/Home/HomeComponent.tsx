@@ -2,7 +2,7 @@ import React from "react";
 import Axios from "axios";
 import socketIOClient from "socket.io-client";
 import { Props, State } from "./HomeModel";
-import { Button, FormControl, InputGroup, Navbar } from "react-bootstrap";
+import { Button, Form, FormControl, InputGroup, Navbar } from "react-bootstrap";
 import { API } from "config";
 import { getLs, getUserLs } from "util/CrossUtil";
 
@@ -14,7 +14,6 @@ export default class Home extends React.Component<Props, State> {
     super(props);
     this.state = {
       chatData: [],
-      message: "",
     };
   }
 
@@ -58,27 +57,28 @@ export default class Home extends React.Component<Props, State> {
     this.socket.close();
   }
 
-  setMessage = (message: string) => {
-    this.setState({ message });
-  };
-
   sendMessage = () => {
-    const { message } = this.state;
-    document.getElementById("text-message")?.focus();
+    const sendMessageEl: any = document.getElementById("send-message");
+    const textMessageEl: any = document.getElementById("text-message");
+
+    sendMessageEl.disable = true;
+    textMessageEl.focus();
+
+    const message = textMessageEl.value;
     message &&
       Axios.post(`${API.backend}/chat-send-message`, {
         sender: getUserLs().username,
         reciever: getLs("chatWith"),
         message,
       }).then((response) => {
-        this.setState({ message: "" }, () => {
-          document.getElementById("bottom")?.scrollIntoView();
-        });
+        sendMessageEl.disable = false;
+        textMessageEl.value = "";
+        document.getElementById("bottom")?.scrollIntoView();
       });
   };
 
   render() {
-    const { chatData, message } = this.state;
+    const { chatData } = this.state;
     const currentUser = getUserLs();
 
     return (
@@ -122,25 +122,28 @@ export default class Home extends React.Component<Props, State> {
         </div>
         <div className="d-flex flex-row">
           <Navbar bg="light" variant="light" fixed="bottom">
-            <InputGroup className="">
-              <FormControl
-                id="text-message"
-                value={message}
-                placeholder="Type your msg here ..."
-                onChange={(e) => this.setMessage(e.target.value)}
-              />
-              <InputGroup.Append>
-                <Button
-                  variant="outline-info"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    this.sendMessage();
-                  }}
-                >
-                  Send
-                </Button>
-              </InputGroup.Append>
-            </InputGroup>
+            <Form autoComplete="off" className="w-100">
+              <InputGroup className="">
+                <FormControl
+                  id="text-message"
+                  placeholder="Type your msg here ..."
+                  autoComplete="off"
+                />
+                <InputGroup.Append>
+                  <Button
+                    variant="outline-info"
+                    type="submit"
+                    id="send-message"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      this.sendMessage();
+                    }}
+                  >
+                    Send
+                  </Button>
+                </InputGroup.Append>
+              </InputGroup>
+            </Form>
           </Navbar>
         </div>
       </>
