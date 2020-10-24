@@ -2,7 +2,7 @@ import React from "react";
 import Axios from "axios";
 import socketIOClient from "socket.io-client";
 import { Props, State } from "./HomeModel";
-import { Button, FormControl, InputGroup, Navbar } from "react-bootstrap";
+import { Button, Form, FormControl, InputGroup, Navbar } from "react-bootstrap";
 import { API } from "config";
 import { getLs, getUserLs } from "util/CrossUtil";
 
@@ -89,26 +89,24 @@ export default class Home extends React.Component<Props, State> {
               return (
                 <div
                   key={index.toString()}
-                  className={`${
-                    e.sender === currentUser.username
-                      ? "text-right"
-                      : "text-left"
-                  }`}
+                  className={`${e.sender === currentUser.username
+                    ? "text-right"
+                    : "text-left"
+                    }`}
                 >
                   {(index > 0
                     ? chatData[index - 1].sender !== e.sender
                     : true) && (
-                    <span
-                      className={`small font-weight-bold ${
-                        e.sender === currentUser.username
+                      <span
+                        className={`small font-weight-bold ${e.sender === currentUser.username
                           ? "text-info"
                           : "text-primary"
-                      }`}
-                    >
-                      {e.sender}
-                      <br />
-                    </span>
-                  )}
+                          }`}
+                      >
+                        {e.sender}
+                        <br />
+                      </span>
+                    )}
                   {`${e.message} `}
                   <span className="small text-muted fs-10">{e.timeStamp}</span>
                 </div>
@@ -122,25 +120,29 @@ export default class Home extends React.Component<Props, State> {
         </div>
         <div className="d-flex flex-row">
           <Navbar bg="light" variant="light" fixed="bottom">
-            <InputGroup className="">
-              <FormControl
-                id="text-message"
-                value={message}
-                placeholder="Type your msg here ..."
-                onChange={(e) => this.setMessage(e.target.value)}
-              />
-              <InputGroup.Append>
-                <Button
-                  variant="outline-info"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    this.sendMessage();
-                  }}
-                >
-                  Send
+            <Form className='w-100'>
+              <InputGroup className="">
+                <FormControl
+                  id="text-message"
+                  value={message}
+                  placeholder="Type your msg here ..."
+                  onChange={(e) => this.setMessage(e.target.value)}
+                />
+                <InputGroup.Append>
+                  <Button
+                    variant="outline-info"
+                    type='submit'
+                    id="send-message"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      this.sendMessage();
+                    }}
+                  >
+                    Send
                 </Button>
-              </InputGroup.Append>
-            </InputGroup>
+                </InputGroup.Append>
+              </InputGroup>
+            </Form>
           </Navbar>
         </div>
       </>
