@@ -14,7 +14,6 @@ export default class Home extends React.Component<Props, State> {
     super(props);
     this.state = {
       chatData: [],
-      message: "",
     };
   }
 
@@ -58,27 +57,28 @@ export default class Home extends React.Component<Props, State> {
     this.socket.close();
   }
 
-  setMessage = (message: string) => {
-    this.setState({ message });
-  };
-
   sendMessage = () => {
-    const { message } = this.state;
-    document.getElementById("text-message")?.focus();
+    const sendMessageEl: any = document.getElementById("send-message");
+    const textMessageEl: any = document.getElementById("text-message");
+
+    sendMessageEl.disable = true;
+    textMessageEl.focus();
+
+    const message = textMessageEl.value;
     message &&
       Axios.post(`${API.backend}/chat-send-message`, {
         sender: getUserLs().username,
         reciever: getLs("chatWith"),
         message,
       }).then((response) => {
-        this.setState({ message: "" }, () => {
-          document.getElementById("bottom")?.scrollIntoView();
-        });
+        sendMessageEl.disable = false;
+        textMessageEl.value = "";
+        document.getElementById("bottom")?.scrollIntoView();
       });
   };
 
   render() {
-    const { chatData, message } = this.state;
+    const { chatData } = this.state;
     const currentUser = getUserLs();
 
     return (
@@ -89,24 +89,26 @@ export default class Home extends React.Component<Props, State> {
               return (
                 <div
                   key={index.toString()}
-                  className={`${e.sender === currentUser.username
-                    ? "text-right"
-                    : "text-left"
-                    }`}
+                  className={`${
+                    e.sender === currentUser.username
+                      ? "text-right"
+                      : "text-left"
+                  }`}
                 >
                   {(index > 0
                     ? chatData[index - 1].sender !== e.sender
                     : true) && (
-                      <span
-                        className={`small font-weight-bold ${e.sender === currentUser.username
+                    <span
+                      className={`small font-weight-bold ${
+                        e.sender === currentUser.username
                           ? "text-info"
                           : "text-primary"
-                          }`}
-                      >
-                        {e.sender}
-                        <br />
-                      </span>
-                    )}
+                      }`}
+                    >
+                      {e.sender}
+                      <br />
+                    </span>
+                  )}
                   {`${e.message} `}
                   <span className="small text-muted fs-10">{e.timeStamp}</span>
                 </div>
@@ -120,18 +122,17 @@ export default class Home extends React.Component<Props, State> {
         </div>
         <div className="d-flex flex-row">
           <Navbar bg="light" variant="light" fixed="bottom">
-            <Form className='w-100'>
+            <Form autoComplete="off" className="w-100">
               <InputGroup className="">
                 <FormControl
                   id="text-message"
-                  value={message}
                   placeholder="Type your msg here ..."
-                  onChange={(e) => this.setMessage(e.target.value)}
+                  autoComplete="off"
                 />
                 <InputGroup.Append>
                   <Button
                     variant="outline-info"
-                    type='submit'
+                    type="submit"
                     id="send-message"
                     onClick={(e) => {
                       e.preventDefault();
@@ -139,7 +140,7 @@ export default class Home extends React.Component<Props, State> {
                     }}
                   >
                     Send
-                </Button>
+                  </Button>
                 </InputGroup.Append>
               </InputGroup>
             </Form>
