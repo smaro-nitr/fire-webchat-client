@@ -7,7 +7,6 @@ import { API } from "config";
 import { getLs, getUserLs } from "util/CrossUtil";
 
 export default class Home extends React.Component<Props, State> {
-  showNotification: any;
   socket: any;
   sendMessageEl: any;
   textMessageEl: any;
@@ -23,14 +22,6 @@ export default class Home extends React.Component<Props, State> {
     this.sendMessageEl = document.getElementById("send-message");
     this.textMessageEl = document.getElementById("text-message");
 
-    window.addEventListener("blur", () => {
-      this.showNotification = true;
-    });
-
-    window.addEventListener("focus", () => {
-      this.showNotification = false;
-    });
-
     this.socket = socketIOClient(API.websocket);
     this.socket.on("message_added", (data: any) => {
       const reciever = getLs("chatWith");
@@ -45,10 +36,6 @@ export default class Home extends React.Component<Props, State> {
         chatData.push(data);
         this.setState({ chatData }, () => {
           document.getElementById("bottom")?.scrollIntoView();
-
-          if (this.showNotification) {
-            // new Notification(`Hi ${sender}`, { body: "New Message Arrived" });
-          }
         });
       }
     });

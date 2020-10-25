@@ -1,5 +1,5 @@
 export const API = {
-  version: 'v1.0.3',
+  version: 'v1.1.0',
   backend: 'https://fire-webchat-server.herokuapp.com',
   websocket: 'https://fire-webchat-server.herokuapp.com'
 }

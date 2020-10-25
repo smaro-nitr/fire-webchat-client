@@ -1,12 +1,15 @@
 import React from "react";
 import Axios from "axios";
 import md5 from "md5";
+import socketIOClient from "socket.io-client";
 import { Button, Form, FormControl, InputGroup } from "react-bootstrap";
 import { Props, State } from "./LoginModel";
 import { API } from "config";
-import { resetLs, setLs } from "util/CrossUtil";
+import { getLs, getUserLs, resetLs, setLs } from "util/CrossUtil";
 
 export default class Login extends React.Component<Props, State> {
+  socket: any;
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -21,6 +24,17 @@ export default class Login extends React.Component<Props, State> {
 
   componentDidMount() {
     resetLs();
+
+    this.socket = socketIOClient(API.websocket);
+
+    if ("Notification" in window) {
+      Notification.requestPermission().then((result) => {});
+    }
+
+    this.socket.on("user_remembered", (data: any) => {
+      if (data === getLs("lastLogin"))
+        new Notification(`Hi ${data}`, { body: "Someone Remembered You !" });
+    });
   }
 
   updateForm = (key: string, value: string) => {
@@ -41,6 +55,7 @@ export default class Login extends React.Component<Props, State> {
         this.setState({ errorMessage: response.data.message });
       } else {
         setLs("user", response.data.message);
+        setLs("lastLogin", getUserLs().username);
         history.push("/contact");
       }
     });

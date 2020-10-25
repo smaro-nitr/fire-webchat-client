@@ -1,14 +1,15 @@
 .navbar-nav a {
-  color: rgb(255, 255, 255) !important;
+  color: #FFF !important;
 }
-
 .navbar-nav a.active-menu {
-  color: rgb(0, 255, 255) !important;
+  color:#0FF !important;
 }
 
-.nav-link:hover,
 .fa-arrow-left:hover {
-  color: rgb(0, 255, 255) !important;
+  color: #0FF !important;
+}
+.fa-heartbeat:hover {
+  text-shadow: 0px 0px 5px #0FF, 0 0 5px #0FF, 0 0 5px #0FF;
 }
 
 .shadow {
@@ -16,5 +17,5 @@
 }
 
 .text-white:hover {
-  color: #fff !important;
+  color: #FFF !important;
 }

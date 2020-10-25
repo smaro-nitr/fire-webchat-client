@@ -40,10 +40,6 @@ export default class Navbar extends React.Component<Props, State> {
       this.logout();
     });
 
-    // Notification.requestPermission().then((result) => {
-    //   console.log(result);
-    // });
-
     this.initializeAutoLogout();
 
     this.socket = socketIOClient(API.websocket);
@@ -81,6 +77,12 @@ export default class Navbar extends React.Component<Props, State> {
     }, 180000);
   };
 
+  rememberSomeone = (remember: string) => {
+    Axios.post(`${API.backend}/remember`, {
+      remember,
+    });
+  };
+
   logout = (exit?: boolean) => {
     const { history } = this.props;
     Axios.post(`${API.backend}/chat-sign-out`, {
@@ -89,7 +91,7 @@ export default class Navbar extends React.Component<Props, State> {
       setLs("user", "");
       setLs("chatWith", "");
       history.push("/");
-      if (exit) window.location.replace("https://www.youtube.com/");
+      // if (exit) window.location.replace("https://www.youtube.com/");
     });
   };
 
@@ -112,7 +114,7 @@ export default class Navbar extends React.Component<Props, State> {
       >
         <BsNavbar.Brand
           id="brand-title"
-          className="font-weight-bold text-white"
+          className="font-weight-bold text-white fs-20"
         >
           <>
             {chatWith && (
@@ -139,8 +141,14 @@ export default class Navbar extends React.Component<Props, State> {
         </BsNavbar.Brand>
         <Nav className="ml-auto">
           <Nav.Link href="#">
+            {chatWith && (
+              <i
+                className="fas fa-heartbeat text-danger fs-20 shadow ml-auto"
+                onClick={() => this.rememberSomeone(chatWith)}
+              ></i>
+            )}
             <i
-              className="fas fa-power-off pl-3"
+              className="fas fa-power-off pl-3 fs-20 ml-auto"
               title="logout"
               onClick={this.exit}
             ></i>
