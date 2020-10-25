@@ -9,6 +9,8 @@ import { getLs, getUserLs } from "util/CrossUtil";
 export default class Home extends React.Component<Props, State> {
   showNotification: any;
   socket: any;
+  sendMessageEl: any;
+  textMessageEl: any;
 
   constructor(props: Props) {
     super(props);
@@ -18,6 +20,9 @@ export default class Home extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    this.sendMessageEl = document.getElementById("send-message");
+    this.textMessageEl = document.getElementById("text-message");
+
     window.addEventListener("blur", () => {
       this.showNotification = true;
     });
@@ -58,21 +63,17 @@ export default class Home extends React.Component<Props, State> {
   }
 
   sendMessage = () => {
-    const sendMessageEl: any = document.getElementById("send-message");
-    const textMessageEl: any = document.getElementById("text-message");
+    this.textMessageEl.focus();
+    const message = this.textMessageEl.value;
+    this.textMessageEl.value = "";
 
-    sendMessageEl.disable = true;
-    textMessageEl.focus();
-
-    const message = textMessageEl.value;
     message &&
       Axios.post(`${API.backend}/chat-send-message`, {
         sender: getUserLs().username,
         reciever: getLs("chatWith"),
         message,
       }).then((response) => {
-        sendMessageEl.disable = false;
-        textMessageEl.value = "";
+        this.sendMessageEl.disable = false;
         document.getElementById("bottom")?.scrollIntoView();
       });
   };
@@ -136,6 +137,7 @@ export default class Home extends React.Component<Props, State> {
                     id="send-message"
                     onClick={(e) => {
                       e.preventDefault();
+                      this.sendMessageEl.disable = true;
                       this.sendMessage();
                     }}
                   >
