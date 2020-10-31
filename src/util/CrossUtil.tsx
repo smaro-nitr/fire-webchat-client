@@ -4,7 +4,7 @@ export const setLs = (key: string, value: string) => {
 };
 
 export const getLs = (key: string) => {
-  return window.localStorage.getItem(key);
+  return window.localStorage.getItem(key) || '';
 };
 
 export const getUserLs = () => {

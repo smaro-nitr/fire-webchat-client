@@ -4,5 +4,6 @@ export interface Props {
 
 export interface State {
   activeChat: boolean
+  lastRemembered: string
   refreshingData: boolean
 }

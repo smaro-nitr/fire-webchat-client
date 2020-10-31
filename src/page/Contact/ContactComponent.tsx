@@ -1,5 +1,5 @@
 import React from "react";
-import socketIOClient from "socket.io-client";
+import SocketIOClient from "socket.io-client";
 import { Props, State } from "./ContactModel";
 import { API } from "config";
 import { getUserLs, setLs } from "util/CrossUtil";
@@ -17,7 +17,7 @@ export default class Contact extends React.Component<Props, State> {
   componentDidMount() {
     setLs("chatWith", "");
 
-    this.socket = socketIOClient(API.websocket);
+    this.socket = SocketIOClient(API.websocket);
 
     this.socket.on("user_added", (data: any) => {
       const user = JSON.parse(JSON.stringify(this.state.user));

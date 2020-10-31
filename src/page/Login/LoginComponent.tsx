@@ -1,7 +1,7 @@
 import React from "react";
 import Axios from "axios";
 import md5 from "md5";
-import socketIOClient from "socket.io-client";
+import SocketIOClient from "socket.io-client";
 import { Button, Form, FormControl, InputGroup } from "react-bootstrap";
 import { Props, State } from "./LoginModel";
 import { API } from "config";
@@ -25,7 +25,7 @@ export default class Login extends React.Component<Props, State> {
   componentDidMount() {
     resetLs();
 
-    this.socket = socketIOClient(API.websocket);
+    this.socket = SocketIOClient(API.websocket);
 
     if ("Notification" in window) {
       Notification.requestPermission().then((result) => {});

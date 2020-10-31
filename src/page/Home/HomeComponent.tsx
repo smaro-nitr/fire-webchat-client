@@ -1,6 +1,6 @@
 import React from "react";
 import Axios from "axios";
-import socketIOClient from "socket.io-client";
+import SocketIOClient from "socket.io-client";
 import { Props, State } from "./HomeModel";
 import { Button, Form, FormControl, InputGroup, Navbar } from "react-bootstrap";
 import { API } from "config";
@@ -8,8 +8,8 @@ import { getLs, getUserLs } from "util/CrossUtil";
 
 export default class Home extends React.Component<Props, State> {
   socket: any;
-  sendMessageEl: any;
   textMessageEl: any;
+  sendMessageEl: any;
 
   constructor(props: Props) {
     super(props);
@@ -19,10 +19,11 @@ export default class Home extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.sendMessageEl = document.getElementById("send-message");
     this.textMessageEl = document.getElementById("text-message");
+    this.sendMessageEl = document.getElementById("send-message");
 
-    this.socket = socketIOClient(API.websocket);
+    this.socket = SocketIOClient(API.websocket);
+
     this.socket.on("message_added", (data: any) => {
       const reciever = getLs("chatWith");
 
@@ -38,9 +39,18 @@ export default class Home extends React.Component<Props, State> {
           document.getElementById("bottom")?.scrollIntoView();
         });
       }
+
+      if (data.message === getUserLs().defaultParam.clearTimeMessage) {
+        this.textMessageEl.disabled = true;
+        this.sendMessageEl.disabled = true;
+      }
     });
 
     this.socket.on("message_removed", (data: any) => {
+      if (data.message === getUserLs().defaultParam.clearTimeMessage) {
+        this.textMessageEl.disabled = false;
+        this.sendMessageEl.disabled = false;
+      }
       this.setState({ chatData: [] });
     });
   }
@@ -54,7 +64,7 @@ export default class Home extends React.Component<Props, State> {
     const message = this.textMessageEl.value;
     this.textMessageEl.value = "";
 
-    message &&
+    message && !this.textMessageEl.disabled &&
       Axios.post(`${API.backend}/chat-send-message`, {
         sender: getUserLs().username,
         reciever: getLs("chatWith"),
@@ -124,11 +134,11 @@ export default class Home extends React.Component<Props, State> {
                     id="send-message"
                     onClick={(e) => {
                       e.preventDefault();
-                      this.sendMessageEl.disable = true;
+                      this.sendMessageEl.disabled = true;
                       this.sendMessage();
                     }}
                   >
-                    Send
+                    <i className="fa fa-paper-plane"></i>
                   </Button>
                 </InputGroup.Append>
               </InputGroup>
