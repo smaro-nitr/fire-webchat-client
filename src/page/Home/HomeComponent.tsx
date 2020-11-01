@@ -51,6 +51,7 @@ export default class Home extends React.Component<Props, State> {
         this.textMessageEl.disabled = false;
         this.sendMessageEl.disabled = false;
       }
+
       this.setState({ chatData: [] });
     });
   }
@@ -61,16 +62,18 @@ export default class Home extends React.Component<Props, State> {
 
   sendMessage = () => {
     this.textMessageEl.focus();
+    this.sendMessageEl.blur();
     const message = this.textMessageEl.value;
     this.textMessageEl.value = "";
 
-    message && !this.textMessageEl.disabled &&
+    message &&
+      !this.textMessageEl.disabled &&
       Axios.post(`${API.backend}/chat-send-message`, {
         sender: getUserLs().username,
         reciever: getLs("chatWith"),
         message,
       }).then((response) => {
-        this.sendMessageEl.disable = false;
+        this.sendMessageEl.disabled = false;
         document.getElementById("bottom")?.scrollIntoView();
       });
   };
@@ -134,11 +137,10 @@ export default class Home extends React.Component<Props, State> {
                     id="send-message"
                     onClick={(e) => {
                       e.preventDefault();
-                      this.sendMessageEl.disabled = true;
                       this.sendMessage();
                     }}
                   >
-                    <i className="fa fa-paper-plane"></i>
+                    &nbsp; <i className="fa fa-paper-plane"></i> &nbsp;
                   </Button>
                 </InputGroup.Append>
               </InputGroup>
