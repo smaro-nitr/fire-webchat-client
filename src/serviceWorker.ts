@@ -1,3 +1,7 @@
+import SocketIOClient from "socket.io-client";
+import { API } from "config";
+import { getLs } from "util/CrossUtil";
+
 // This optional code is used to register a service worker.
 // register() is not called by default.
 
@@ -9,6 +13,8 @@
 
 // To learn more about the benefits of this model and instructions on how to
 // opt-in, read https://bit.ly/CRA-PWA
+
+const socket = SocketIOClient(API.websocket)
 
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
@@ -25,6 +31,15 @@ type Config = {
   onUpdate?: (registration: ServiceWorkerRegistration) => void;
 };
 
+function showNotification(name: string) {
+  navigator.serviceWorker.ready.then(function(registration) {
+    registration.showNotification(`Hi ${name}`, {
+      body: 'Someone Remembered You !',
+      vibrate: [200, 100, 200, 100, 200, 100, 200],
+    });
+  });
+}
+
 export function register(config?: Config) {
   if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
@@ -39,6 +54,15 @@ export function register(config?: Config) {
       return;
     }
 
+    if ("Notification" in window) {
+      Notification.requestPermission().then((result) => {});
+    }
+
+    socket.on("user_remembered", (data: any) => {
+      if (data === getLs("lastLogin")) showNotification(data)
+    });
+
+    
     window.addEventListener('load', () => {
       const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
 
@@ -120,6 +144,12 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
       ) {
         // No service worker found. Probably a different app. Reload the page.
         navigator.serviceWorker.ready.then(registration => {
+          registration.showNotification('Vibration Sample', {
+            body: 'Buzz! Buzz!',
+            vibrate: [200, 100, 200, 100, 200, 100, 200],
+            tag: 'vibration-sample'
+          });
+
           registration.unregister().then(() => {
             window.location.reload();
           });
