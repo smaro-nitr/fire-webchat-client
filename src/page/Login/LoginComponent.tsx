@@ -35,18 +35,18 @@ export default class Login extends React.Component<Props, State> {
     const { history } = this.props;
     const { formDetail } = this.state;
 
-    Axios.post(`${API.backend}/${signIn ? "chat-sign-in" : "chat-sign-up"}`, {
+    Axios.post(`${API.backend}/login/${signIn ? "sign-in" : "sign-up"}`, {
       username: formDetail.username,
       password: formDetail.password,
-    }).then((response) => {
-      if (response.data.status === 300) {
-        this.setState({ errorMessage: response.data.message });
-      } else {
-        setLs("user", response.data.message);
+    })
+      .then((res) => {
+        setLs("user", JSON.stringify(res.data));
         setLs("lastLogin", getUserLs().username);
         history.push("/contact");
-      }
-    });
+      })
+      .catch((err) => {
+        this.setState({ errorMessage: err?.response?.data });
+      });
   };
 
   enableSignUp = () => {

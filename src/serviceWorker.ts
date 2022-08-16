@@ -34,9 +34,11 @@ type Config = {
 function showNotification(name: string) {
   navigator.serviceWorker.ready.then(function(registration) {
     registration.showNotification(`Hi ${name}`, {
-      body: 'Someone Remembered You !',
-      vibrate: [200, 100, 200, 100, 200, 100, 200],
+      body: 'Haye HooK Haye HooK Hayee Hayee !',
+      icon: '../public/logo256.png',
+      tag: 'fire-webchat'
     });
+    navigator.vibrate && navigator.vibrate([250, 250, 500, 250, 500, 250, 500])
   });
 }
 

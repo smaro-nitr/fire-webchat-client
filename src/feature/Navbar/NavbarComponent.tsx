@@ -18,7 +18,7 @@ export default class Navbar extends React.Component<Props, State> {
     super(props);
     this.state = {
       activeChat: false,
-      lastRemembered: getLs('remembered'),
+      lastRemembered: getLs("remembered"),
       refreshingData: false,
     };
   }
@@ -70,7 +70,7 @@ export default class Navbar extends React.Component<Props, State> {
     });
 
     this.socket.on("user_remembered", (data: any) => {
-      this.setState({lastRemembered: data}, () => setLs('remembered', data))
+      this.setState({ lastRemembered: data }, () => setLs("remembered", data));
     });
   };
 
@@ -93,7 +93,7 @@ export default class Navbar extends React.Component<Props, State> {
 
   logout = (exit?: boolean) => {
     const { history } = this.props;
-    Axios.post(`${API.backend}/chat-sign-out`, {
+    Axios.post(`${API.backend}/login/sign-out`, {
       username: getUserLs().username,
     }).then((response) => {
       setLs("user", "");

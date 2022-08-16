@@ -1,10 +1,10 @@
 export const setLs = (key: string, value: string) => {
   window.localStorage.setItem(key, value);
-  return value
+  return value;
 };
 
 export const getLs = (key: string) => {
-  return window.localStorage.getItem(key) || '';
+  return window.localStorage.getItem(key) || "";
 };
 
 export const getUserLs = () => {
@@ -12,7 +12,7 @@ export const getUserLs = () => {
   const defaultUser = {
     defaultParam: {
       clearTime: 0,
-      clearTimeMessage: '',
+      clearTimeMessage: "",
       signOutTime: 0,
     },
     chatClear: 0,
@@ -32,4 +32,4 @@ export const resetLs = () => {
   setLs("user", "");
   setLs("chatWith", "");
   setLs("chatClear", "");
-}
+};
