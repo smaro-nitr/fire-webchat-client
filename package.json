@@ -1,7 +1,9 @@
 {
-  "name": "chat-client",
+  "name": "fire-webchat-client",
   "version": "0.1.0",
   "private": true,
+  "author": "subhendu kumar sahoo",
+  "email": "smaro.nitr@gmail.com",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.13.0",
     "@testing-library/jest-dom": "^4.2.4",

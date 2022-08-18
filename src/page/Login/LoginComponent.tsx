@@ -51,14 +51,17 @@ export default class Login extends React.Component<Props, State> {
 
   enableSignUp = () => {
     const secretCode: any = document.getElementById("secret-code");
-    this.setState({
-      formDetail: {
-        username: "",
-        password: "",
+    this.setState(
+      {
+        formDetail: {
+          username: "",
+          password: "",
+        },
+        loginInterface:
+          md5(secretCode.value) !== "5764eccdfdd4cecbc6c319ce44cffea8",
       },
-      loginInterface:
-        md5(secretCode.value) !== "fb9abce118c6f8c034ec673f9f447870",
-    });
+      () => (secretCode.value = "")
+    );
   };
 
   render() {
@@ -106,7 +109,10 @@ export default class Login extends React.Component<Props, State> {
               <FormControl
                 type="password"
                 id="secret-code"
-                placeholder="Referral"
+                disabled={!loginInterface}
+                placeholder={
+                  loginInterface ? "Join by Refer" : "Click Button To Cancel"
+                }
               />
               <InputGroup.Append onClick={this.enableSignUp}>
                 <InputGroup.Text>
