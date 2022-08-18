@@ -18,7 +18,6 @@ export default class Navbar extends React.Component<Props, State> {
     super(props);
     this.state = {
       activeChat: false,
-      lastRemembered: getLs("remembered"),
       refreshingData: false,
     };
   }
@@ -68,10 +67,6 @@ export default class Navbar extends React.Component<Props, State> {
         this.setState({ activeChat: data.loggedIn });
       }
     });
-
-    this.socket.on("user_remembered", (data: any) => {
-      this.setState({ lastRemembered: data }, () => setLs("remembered", data));
-    });
   };
 
   componentWillUnmount() {
@@ -109,7 +104,7 @@ export default class Navbar extends React.Component<Props, State> {
 
   render() {
     const { history } = this.props;
-    const { activeChat, lastRemembered, refreshingData } = this.state;
+    const { activeChat, refreshingData } = this.state;
 
     const chatWith = getLs("chatWith");
 
@@ -149,12 +144,6 @@ export default class Navbar extends React.Component<Props, State> {
         </BsNavbar.Brand>
         <Nav className="ml-auto">
           <Nav.Link href="#">
-            {chatWith && lastRemembered !== chatWith && (
-              <i
-                className="fas fa-heartbeat text-danger fs-20 shadow ml-auto"
-                onClick={() => this.rememberSomeone(chatWith)}
-              ></i>
-            )}
             <i
               className="fas fa-power-off pl-3 fs-20 ml-auto"
               title="logout"

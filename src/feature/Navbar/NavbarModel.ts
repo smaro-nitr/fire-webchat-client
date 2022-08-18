@@ -1,9 +1,8 @@
 export interface Props {
-  history: any
+  history: any;
 }
 
 export interface State {
-  activeChat: boolean
-  lastRemembered: string
-  refreshingData: boolean
+  activeChat: boolean;
+  refreshingData: boolean;
 }
