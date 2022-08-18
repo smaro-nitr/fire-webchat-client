@@ -1,4 +1,4 @@
-import Home from "page/Home/HomeComponent";
+import Chat from "page/Chat/ChatComponent";
 import Login from "page/Login/LoginComponent";
 import NotFound from "feature/NotFound/NotFoundComponent";
 import Navbar from "feature/Navbar/NavbarComponent";
@@ -11,8 +11,8 @@ export const navbar = [
     path: "/home",
     exact: true,
     sidebar: Navbar,
-    main: Home,
-    title: "Home",
+    main: Chat,
+    title: "Chat",
   },
   {
     path: "/contact",

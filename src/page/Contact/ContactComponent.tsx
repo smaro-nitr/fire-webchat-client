@@ -1,5 +1,6 @@
 import React from "react";
 import SocketIOClient from "socket.io-client";
+import Axios from "axios";
 import { Props, State } from "./ContactModel";
 import { API } from "config";
 import { getUserLs, setLs } from "util/CrossUtil";
@@ -17,23 +18,22 @@ export default class Contact extends React.Component<Props, State> {
   componentDidMount() {
     setLs("chatWith", "");
 
+    this.fetchUserList();
+
     this.socket = SocketIOClient(API.websocket);
 
-    this.socket.on("user_added", (data: any) => {
-      const user = JSON.parse(JSON.stringify(this.state.user));
-      if (!user.map((e: any) => e.username).includes(data.username))
-        user.push(data);
-      this.setState({ user });
-    });
-    
-    this.socket.on("user_updated", (data: any) => {
-      const user = JSON.parse(JSON.stringify(this.state.user));
-      user.forEach((e: any, index: number) => {
-        if (e.username === data.username) user[index] = data;
-      });
-      this.setState({ user });
+    this.socket.once("new-sign-up", (data: any) => {
+      this.fetchUserList();
     });
   }
+
+  fetchUserList = () => {
+    Axios.get(`${API.backend}/user`)
+      .then((res) => {
+        this.setState({ user: res.data });
+      })
+      .catch((err) => {});
+  };
 
   startChat = (chatWith: string) => {
     const { history } = this.props;

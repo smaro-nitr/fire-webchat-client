@@ -1,7 +1,7 @@
 import React from "react";
 import Axios from "axios";
 import SocketIOClient from "socket.io-client";
-import { Props, State } from "./HomeModel";
+import { Props, State } from "./ChatModel";
 import { Button, Form, FormControl, InputGroup, Navbar } from "react-bootstrap";
 import { API } from "config";
 import { getLs, getUserLs } from "util/CrossUtil";
@@ -16,6 +16,12 @@ export default class Home extends React.Component<Props, State> {
     this.state = {
       chatData: [],
     };
+
+    Axios.get(`${API.backend}/chat/`)
+      .then((res) => {
+        this.filterMessage(res.data);
+      })
+      .catch((err) => {});
   }
 
   componentDidMount() {
@@ -24,26 +30,9 @@ export default class Home extends React.Component<Props, State> {
 
     this.socket = SocketIOClient(API.websocket);
 
-    this.socket.on("message_added", (data: any) => {
-      const reciever = getLs("chatWith");
-
-      const sender = getUserLs().username;
-      const validSender = data.sender === sender || data.sender === reciever;
-      const validReciever =
-        data.reciever === sender || data.reciever === reciever;
-
-      if (validSender && validReciever) {
-        const chatData = JSON.parse(JSON.stringify(this.state.chatData));
-        chatData.push(data);
-        this.setState({ chatData }, () => {
-          document.getElementById("bottom")?.scrollIntoView();
-        });
-      }
-
-      if (data.message === getUserLs().defaultParam.clearTimeMessage) {
-        this.textMessageEl.disabled = true;
-        this.sendMessageEl.disabled = true;
-      }
+    this.socket.on("new-message", (data: any) => {
+      console.log(data);
+      this.filterMessage(data);
     });
 
     this.socket.on("message_removed", (data: any) => {
@@ -60,6 +49,28 @@ export default class Home extends React.Component<Props, State> {
     this.socket.close();
   }
 
+  filterMessage = (data: any) => {
+    const chatData = JSON.parse(JSON.stringify(this.state.chatData));
+    const reciever = getLs("chatWith");
+    const sender = getUserLs().username;
+
+    if (reciever && sender) {
+      const filteredChatData = data.filter(
+        (item: any) =>
+          [reciever, sender].includes(item.reciever) &&
+          [reciever, sender].includes(item.sender)
+      );
+      this.setState(
+        (prevState) => {
+          return { chatData: [...chatData, ...filteredChatData] };
+        },
+        () => {
+          document.getElementById("bottom")?.scrollIntoView();
+        }
+      );
+    }
+  };
+
   sendMessage = () => {
     this.textMessageEl.focus();
     this.sendMessageEl.blur();
@@ -68,7 +79,7 @@ export default class Home extends React.Component<Props, State> {
 
     message &&
       !this.textMessageEl.disabled &&
-      Axios.post(`${API.backend}/chat-send-message`, {
+      Axios.post(`${API.backend}/chat/send`, {
         sender: getUserLs().username,
         reciever: getLs("chatWith"),
         message,

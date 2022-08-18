@@ -28,18 +28,18 @@ export default class Navbar extends React.Component<Props, State> {
 
     if (!authorizeUser()) history.push("/");
 
-    window.addEventListener("mousemove", () => {
-      clearInterval(this.autoLogout);
-      this.initializeAutoLogout();
-    });
+    // window.addEventListener("mousemove", () => {
+    //   clearInterval(this.autoLogout);
+    //   this.initializeAutoLogout();
+    // });
 
-    window.addEventListener("beforeunload", () => {
-      this.logout();
-    });
+    // window.addEventListener("beforeunload", () => {
+    //   this.logout();
+    // });
 
-    window.addEventListener("blur", () => {
-      this.logout();
-    });
+    // window.addEventListener("blur", () => {
+    //   this.logout();
+    // });
 
     this.initializeAutoLogout();
 
