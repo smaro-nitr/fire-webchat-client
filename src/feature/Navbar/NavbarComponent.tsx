@@ -10,7 +10,6 @@ import { API } from "config";
 export default class Navbar extends React.Component<Props, State> {
   static defaultProps: Partial<Props> = {};
 
-  timer: any;
   autoLogout: any;
   socket: any;
 
@@ -18,8 +17,9 @@ export default class Navbar extends React.Component<Props, State> {
     super(props);
     this.state = {
       activeChat: false,
-      refreshingData: false,
     };
+
+    this.fetchUserList();
   }
 
   componentDidMount = () => {
@@ -44,33 +44,26 @@ export default class Navbar extends React.Component<Props, State> {
 
     this.socket = SocketIOClient(API.websocket);
 
-    this.socket.on("message_added", (data: any) => {
-      if (data.message === getUserLs().defaultParam.clearTimeMessage) {
-        this.setState({ refreshingData: true });
-      }
-    });
-
-    this.socket.on("message_removed", (data: any) => {
-      if (data.message === getUserLs().defaultParam.clearTimeMessage) {
-        this.setState({ refreshingData: false });
-      }
-    });
-
-    this.socket.on("user_added", (data: any) => {
-      if (data.username === getLs("chatWith")) {
-        this.setState({ activeChat: data.loggedIn });
-      }
-    });
-
-    this.socket.on("user_updated", (data: any) => {
-      if (data.username === getLs("chatWith")) {
-        this.setState({ activeChat: data.loggedIn });
-      }
+    this.socket.once("user-update", (data: any) => {
+      this.fetchUserList();
     });
   };
 
+  fetchUserList = () => {
+    Axios.get(`${API.backend}/user`)
+      .then((res) => {
+        const chatWith = getLs("chatWith");
+        if (chatWith) {
+          const currentUser = res.data.filter(
+            (item: any) => item.username === getLs("chatWith")
+          );
+          this.setState({ activeChat: currentUser[0].loggedIn });
+        }
+      })
+      .catch((err) => {});
+  };
+
   componentWillUnmount() {
-    clearInterval(this.timer);
     this.socket.close();
   }
 
@@ -78,12 +71,6 @@ export default class Navbar extends React.Component<Props, State> {
     this.autoLogout = setTimeout(() => {
       this.logout();
     }, 180000);
-  };
-
-  rememberSomeone = (remember: string) => {
-    Axios.post(`${API.backend}/remember`, {
-      remember,
-    });
   };
 
   logout = (exit?: boolean) => {
@@ -104,7 +91,7 @@ export default class Navbar extends React.Component<Props, State> {
 
   render() {
     const { history } = this.props;
-    const { activeChat, refreshingData } = this.state;
+    const { activeChat } = this.state;
 
     const chatWith = getLs("chatWith");
 
@@ -130,10 +117,7 @@ export default class Navbar extends React.Component<Props, State> {
               ></i>
             )}
             {chatWith ? chatWith : "Fire Webchat"}
-            {refreshingData && (
-              <i className="ml-2 fas fa-spinner fa-spin text-white"></i>
-            )}
-            {chatWith && !refreshingData && (
+            {chatWith && (
               <i
                 className={`ml-2 fas fa-circle shadow ${
                   activeChat ? "text-success" : "text-warning"

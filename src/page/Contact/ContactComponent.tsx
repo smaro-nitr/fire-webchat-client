@@ -22,7 +22,7 @@ export default class Contact extends React.Component<Props, State> {
 
     this.socket = SocketIOClient(API.websocket);
 
-    this.socket.once("new-sign-up", (data: any) => {
+    this.socket.once("user-update", (data: any) => {
       this.fetchUserList();
     });
   }
