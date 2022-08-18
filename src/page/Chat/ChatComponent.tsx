@@ -31,17 +31,18 @@ export default class Home extends React.Component<Props, State> {
     this.socket = SocketIOClient(API.websocket);
 
     this.socket.on("new-message", (data: any) => {
-      console.log(data);
       this.filterMessage(data);
     });
 
-    this.socket.on("message_removed", (data: any) => {
-      if (data.message === getUserLs().defaultParam.clearTimeMessage) {
-        this.textMessageEl.disabled = false;
-        this.sendMessageEl.disabled = false;
-      }
-
-      this.setState({ chatData: [] });
+    this.socket.on("clean-message", (data: any) => {
+      this.textMessageEl.disabled = false;
+      this.sendMessageEl.disabled = false;
+      this.setState({ chatData: data }, () => {
+        setTimeout(() => {
+          this.textMessageEl.disabled = true;
+          this.sendMessageEl.disabled = true;
+        }, 3000);
+      });
     });
   }
 
