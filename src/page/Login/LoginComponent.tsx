@@ -5,6 +5,7 @@ import { Props, State } from "./LoginModel";
 import { API } from "config";
 import { getUserLs, resetLs, setLs } from "util/CrossUtil";
 import { axios } from "util/ApiUtil";
+import { intializeSocket } from "util/SocketUtil";
 
 export default class Login extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -43,6 +44,7 @@ export default class Login extends React.Component<Props, State> {
         true
       )
       .then((res) => {
+        intializeSocket();
         setLs("user", res?.data);
         setLs("lastLogin", getUserLs().username);
         res?.data && history.push("/contact");
