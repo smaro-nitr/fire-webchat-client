@@ -3,5 +3,5 @@ export interface Props {
 }
 
 export interface State {
-  activeChat: boolean;
+  activeChat: any[];
 }

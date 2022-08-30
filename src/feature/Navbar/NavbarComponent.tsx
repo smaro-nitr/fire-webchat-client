@@ -1,25 +1,23 @@
 import React from "react";
-import Axios from "axios";
 import SocketIOClient from "socket.io-client";
 import BsNavbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import { Props, State } from "./NavbarModel";
-import { authorizeUser, getLs, getUserLs, setLs } from "util/CrossUtil";
+import { authorizeUser } from "util/CrossUtil";
+import { getLs, getUserLs, setLs } from "util/CrossUtil";
 import { API } from "config";
+import { axios } from "util/ApiUtil";
 
 export default class Navbar extends React.Component<Props, State> {
   static defaultProps: Partial<Props> = {};
 
-  autoLogout: any;
   socket: any;
 
   constructor(props: Props) {
     super(props);
     this.state = {
-      activeChat: false,
+      activeChat: [],
     };
-
-    this.fetchUserList();
   }
 
   componentDidMount = () => {
@@ -27,66 +25,49 @@ export default class Navbar extends React.Component<Props, State> {
 
     if (!authorizeUser()) history.push("/");
 
-    // window.addEventListener("mousemove", () => {
-    //   clearInterval(this.autoLogout);
-    //   this.initializeAutoLogout();
-    // });
-
-    // window.addEventListener("beforeunload", () => {
-    //   this.logout();
-    // });
-
-    // window.addEventListener("blur", () => {
-    //   this.logout();
-    // });
-
-    this.initializeAutoLogout();
-
     this.socket = SocketIOClient(API.websocket);
 
-    this.socket.once("user-update", (data: any) => {
-      this.fetchUserList();
-    });
-  };
+    this.fetchActiveUser();
 
-  fetchUserList = () => {
-    Axios.get(`${API.backend}/user`)
-      .then((res) => {
-        const chatWith = getLs("chatWith");
-        if (chatWith) {
-          const currentUser = res.data.filter(
-            (item: any) => item.username === getLs("chatWith")
-          );
-          this.setState({ activeChat: currentUser[0].loggedIn });
-        }
-      })
-      .catch((err) => {});
+    this.socket.on("user-update", (data: any) => {
+      this.fetchActiveUser();
+    });
+
+    this.socket.on("sign-out", (data: any) => {
+      if (getLs("user") === data.data) {
+        setLs("user", "");
+        setLs("chatWith", "");
+        history.push("/");
+      }
+    });
   };
 
   componentWillUnmount() {
     this.socket.close();
   }
 
-  initializeAutoLogout = () => {
-    this.autoLogout = setTimeout(() => {
-      this.logout();
-    }, 180000);
+  fetchActiveUser = () => {
+    axios
+      .get(`${API.backend}/user/active`)
+      .then((res) => {
+        this.setState({ activeChat: res.data });
+      })
+      .catch((err) => {});
   };
 
-  logout = (exit?: boolean) => {
+  logout = () => {
     const { history } = this.props;
-    Axios.post(`${API.backend}/login/sign-out`, {
-      username: getUserLs().username,
-    }).then((response) => {
-      setLs("user", "");
-      setLs("chatWith", "");
-      history.push("/");
-      // if (exit) window.location.replace("https://www.youtube.com/");
-    });
-  };
-
-  exit = () => {
-    this.logout(true);
+    axios
+      .post(`${API.backend}/login/sign-out`, {
+        username: getUserLs().username,
+      })
+      .then((response) => {
+        if (getLs("user") === response.data) {
+          setLs("user", "");
+          setLs("chatWith", "");
+          history.push("/");
+        }
+      });
   };
 
   render() {
@@ -120,7 +101,9 @@ export default class Navbar extends React.Component<Props, State> {
             {chatWith && (
               <i
                 className={`ml-2 fas fa-circle shadow ${
-                  activeChat ? "text-success" : "text-warning"
+                  activeChat.includes(chatWith)
+                    ? "text-success"
+                    : "text-warning"
                 }`}
               ></i>
             )}
@@ -131,7 +114,7 @@ export default class Navbar extends React.Component<Props, State> {
             <i
               className="fas fa-power-off pl-3 fs-20 ml-auto"
               title="logout"
-              onClick={this.exit}
+              onClick={this.logout}
             ></i>
           </Nav.Link>
         </Nav>

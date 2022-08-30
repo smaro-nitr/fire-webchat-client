@@ -1,31 +1,33 @@
+import jwt from "jsonwebtoken";
+
 export const setLs = (key: string, value: string) => {
-  window.localStorage.setItem(key, value);
+  window.sessionStorage.setItem(key, value);
   return value;
 };
 
 export const getLs = (key: string) => {
-  return window.localStorage.getItem(key) || "";
+  return window.sessionStorage.getItem(key) || "";
+};
+
+export const removeLs = (key: string) => {
+  return window.sessionStorage.removeItem(key);
 };
 
 export const getUserLs = () => {
   const currentUser: any = getLs("user");
+  const decoded: any = currentUser && jwt.verify(currentUser, "smaro");
   const defaultUser = {
-    defaultParam: {
-      clearTime: 0,
-      clearTimeMessage: "",
-      signOutTime: 0,
-    },
-    chatClear: 0,
     lastLogin: "",
     username: "",
-    loggedIn: false,
+    expiry: "",
   };
-  return currentUser ? JSON.parse(currentUser) : defaultUser;
+  return currentUser ? decoded : defaultUser;
 };
 
 export const authorizeUser = () => {
   const currentUser = getUserLs();
-  return currentUser.loggedIn;
+  const currentTime = new Date().getTime();
+  return currentUser.expiry > currentTime;
 };
 
 export const resetLs = () => {

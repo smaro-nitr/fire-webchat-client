@@ -1,9 +1,11 @@
+// DEV
 export const API = {
   version: "v2.0.1-beta",
   backend: "https://fire-webchat-server.herokuapp.com",
   websocket: "https://fire-webchat-server.herokuapp.com",
 };
 
+// LOCAL
 // export const API = {
 //   version: "dev",
 //   backend: "http://localhost:8000",

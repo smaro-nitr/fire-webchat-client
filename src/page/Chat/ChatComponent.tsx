@@ -1,10 +1,10 @@
 import React from "react";
-import Axios from "axios";
 import SocketIOClient from "socket.io-client";
 import { Props, State } from "./ChatModel";
 import { Button, Form, FormControl, InputGroup, Navbar } from "react-bootstrap";
 import { API } from "config";
 import { getLs, getUserLs } from "util/CrossUtil";
+import { axios } from "util/ApiUtil";
 
 export default class Home extends React.Component<Props, State> {
   socket: any;
@@ -17,9 +17,11 @@ export default class Home extends React.Component<Props, State> {
       chatData: [],
     };
 
-    Axios.get(`${API.backend}/chat/`)
+    const reciever = getLs("chatWith");
+    axios
+      .get(`${API.backend}/chat/${reciever}`)
       .then((res) => {
-        this.filterMessage(res.data);
+        this.setMessage(res.data);
       })
       .catch((err) => {});
   }
@@ -31,7 +33,7 @@ export default class Home extends React.Component<Props, State> {
     this.socket = SocketIOClient(API.websocket);
 
     this.socket.on("new-message", (data: any) => {
-      this.filterMessage(data);
+      this.setMessage(data);
     });
 
     this.socket.on("clean-message", (data: any) => {
@@ -50,26 +52,15 @@ export default class Home extends React.Component<Props, State> {
     this.socket.close();
   }
 
-  filterMessage = (data: any) => {
-    const chatData = JSON.parse(JSON.stringify(this.state.chatData));
-    const reciever = getLs("chatWith");
-    const sender = getUserLs().username;
-
-    if (reciever && sender) {
-      const filteredChatData = data.filter(
-        (item: any) =>
-          [reciever, sender].includes(item.reciever) &&
-          [reciever, sender].includes(item.sender)
-      );
-      this.setState(
-        (prevState) => {
-          return { chatData: [...chatData, ...filteredChatData] };
-        },
-        () => {
-          document.getElementById("bottom")?.scrollIntoView();
-        }
-      );
-    }
+  setMessage = (data: any) => {
+    this.setState(
+      (prevState) => {
+        return { chatData: [...prevState.chatData, ...data] };
+      },
+      () => {
+        document.getElementById("bottom")?.scrollIntoView();
+      }
+    );
   };
 
   sendMessage = () => {
@@ -80,14 +71,16 @@ export default class Home extends React.Component<Props, State> {
 
     message &&
       !this.textMessageEl.disabled &&
-      Axios.post(`${API.backend}/chat/send`, {
-        sender: getUserLs().username,
-        reciever: getLs("chatWith"),
-        message,
-      }).then((response) => {
-        this.sendMessageEl.disabled = false;
-        document.getElementById("bottom")?.scrollIntoView();
-      });
+      axios
+        .post(`${API.backend}/chat/send`, {
+          sender: getUserLs().username,
+          reciever: getLs("chatWith"),
+          message,
+        })
+        .then((response) => {
+          this.sendMessageEl.disabled = false;
+          document.getElementById("bottom")?.scrollIntoView();
+        });
   };
 
   render() {

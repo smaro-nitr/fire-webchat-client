@@ -1,9 +1,9 @@
 import React from "react";
 import SocketIOClient from "socket.io-client";
-import Axios from "axios";
 import { Props, State } from "./ContactModel";
 import { API } from "config";
 import { getUserLs, setLs } from "util/CrossUtil";
+import { axios } from "util/ApiUtil";
 
 export default class Contact extends React.Component<Props, State> {
   socket: any;
@@ -22,17 +22,33 @@ export default class Contact extends React.Component<Props, State> {
 
     this.socket = SocketIOClient(API.websocket);
 
-    this.socket.once("user-update", (data: any) => {
+    this.socket.on("user-update", (data: any) => {
       this.fetchUserList();
     });
   }
 
-  fetchUserList = () => {
-    Axios.get(`${API.backend}/user`)
+  fetchUserList = async () => {
+    const user = await axios
+      .get(`${API.backend}/user`)
       .then((res) => {
-        this.setState({ user: res.data });
+        return res.data;
       })
       .catch((err) => {});
+
+    const activeStatus = await axios
+      .get(`${API.backend}/user/active`)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => {});
+
+    if (user) {
+      const userWithStatus = user.map((item: any) => {
+        item.loggedIn = (activeStatus || []).includes(item.username);
+        return item;
+      });
+      this.setState({ user: userWithStatus });
+    }
   };
 
   startChat = (chatWith: string) => {
