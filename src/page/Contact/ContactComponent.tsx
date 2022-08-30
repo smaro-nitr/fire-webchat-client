@@ -1,13 +1,11 @@
 import React from "react";
-import SocketIOClient from "socket.io-client";
 import { Props, State } from "./ContactModel";
 import { API } from "config";
 import { getUserLs, setLs } from "util/CrossUtil";
 import { axios } from "util/ApiUtil";
+import { socket } from "util/SocketUtil";
 
 export default class Contact extends React.Component<Props, State> {
-  socket: any;
-
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -20,35 +18,28 @@ export default class Contact extends React.Component<Props, State> {
 
     this.fetchUserList();
 
-    this.socket = SocketIOClient(API.websocket);
-
-    this.socket.on("user-update", (data: any) => {
+    socket.on("user-update", (data: any) => {
       this.fetchUserList();
     });
   }
 
-  fetchUserList = async () => {
-    const user = await axios
+  fetchUserList = () => {
+    axios
       .get(`${API.backend}/user`)
       .then((res) => {
-        return res.data;
+        axios
+          .get(`${API.backend}/user/active`)
+          .then((res2) => {
+            const user = JSON.parse(JSON.stringify(res.data));
+            const userWithStatus = user.map((item: any) => {
+              item.loggedIn = (res2.data || []).includes(item.username);
+              return item;
+            });
+            this.setState({ user: userWithStatus });
+          })
+          .catch((err2) => {});
       })
       .catch((err) => {});
-
-    const activeStatus = await axios
-      .get(`${API.backend}/user/active`)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => {});
-
-    if (user) {
-      const userWithStatus = user.map((item: any) => {
-        item.loggedIn = (activeStatus || []).includes(item.username);
-        return item;
-      });
-      this.setState({ user: userWithStatus });
-    }
   };
 
   startChat = (chatWith: string) => {

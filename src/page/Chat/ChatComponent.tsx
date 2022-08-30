@@ -1,13 +1,12 @@
 import React from "react";
-import SocketIOClient from "socket.io-client";
 import { Props, State } from "./ChatModel";
 import { Button, Form, FormControl, InputGroup, Navbar } from "react-bootstrap";
 import { API } from "config";
 import { getLs, getUserLs } from "util/CrossUtil";
 import { axios } from "util/ApiUtil";
+import { socket } from "util/SocketUtil";
 
 export default class Home extends React.Component<Props, State> {
-  socket: any;
   textMessageEl: any;
   sendMessageEl: any;
 
@@ -30,13 +29,11 @@ export default class Home extends React.Component<Props, State> {
     this.textMessageEl = document.getElementById("text-message");
     this.sendMessageEl = document.getElementById("send-message");
 
-    this.socket = SocketIOClient(API.websocket);
-
-    this.socket.on("new-message", (data: any) => {
+    socket.on("new-message", (data: any) => {
       this.setMessage(data);
     });
 
-    this.socket.on("clean-message", (data: any) => {
+    socket.on("clean-message", (data: any) => {
       this.textMessageEl.disabled = false;
       this.sendMessageEl.disabled = false;
       this.setState({ chatData: data }, () => {
@@ -46,10 +43,6 @@ export default class Home extends React.Component<Props, State> {
         }, 3000);
       });
     });
-  }
-
-  componentWillUnmount() {
-    this.socket.close();
   }
 
   setMessage = (data: any) => {

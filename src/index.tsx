@@ -7,7 +7,7 @@ import ReactDOM from "react-dom";
 import "./index.scss";
 import AppRoute from "AppRoute/AppRouteComponent";
 import ErrorBoundary from "feature/ErrorBoundary/ErrorBoundaryComponent";
-import * as serviceWorker from "./serviceWorker";
+// import * as serviceWorker from "./serviceWorker";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -18,15 +18,15 @@ ReactDOM.render(
   document.getElementById("root")
 );
 
-serviceWorker.register({
-  onUpdate: (serviceWorkerRegistration) => {
-    const registrationWaiting = serviceWorkerRegistration.waiting;
-    if (registrationWaiting) {
-      registrationWaiting.addEventListener("statechange", (e: any) => {
-        if (e.target.state === "activated") {
-          window.location.reload();
-        }
-      });
-    }
-  },
-});
+// serviceWorker.register({
+//   onUpdate: (serviceWorkerRegistration) => {
+//     const registrationWaiting = serviceWorkerRegistration.waiting;
+//     if (registrationWaiting) {
+//       registrationWaiting.addEventListener("statechange", (e: any) => {
+//         if (e.target.state === "activated") {
+//           window.location.reload();
+//         }
+//       });
+//     }
+//   },
+// });

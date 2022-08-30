@@ -7,8 +7,6 @@ import { getUserLs, resetLs, setLs } from "util/CrossUtil";
 import { axios } from "util/ApiUtil";
 
 export default class Login extends React.Component<Props, State> {
-  socket: any;
-
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -47,7 +45,7 @@ export default class Login extends React.Component<Props, State> {
       .then((res) => {
         setLs("user", res?.data);
         setLs("lastLogin", getUserLs().username);
-        history.push("/contact");
+        res?.data && history.push("/contact");
       })
       .catch((err) => {
         this.setState({ errorMessage: err?.response?.data });

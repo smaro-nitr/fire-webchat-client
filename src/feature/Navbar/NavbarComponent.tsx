@@ -1,5 +1,4 @@
 import React from "react";
-import SocketIOClient from "socket.io-client";
 import BsNavbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import { Props, State } from "./NavbarModel";
@@ -7,11 +6,10 @@ import { authorizeUser } from "util/CrossUtil";
 import { getLs, getUserLs, setLs } from "util/CrossUtil";
 import { API } from "config";
 import { axios } from "util/ApiUtil";
+import { socket } from "util/SocketUtil";
 
 export default class Navbar extends React.Component<Props, State> {
   static defaultProps: Partial<Props> = {};
-
-  socket: any;
 
   constructor(props: Props) {
     super(props);
@@ -25,15 +23,13 @@ export default class Navbar extends React.Component<Props, State> {
 
     if (!authorizeUser()) history.push("/");
 
-    this.socket = SocketIOClient(API.websocket);
-
     this.fetchActiveUser();
 
-    this.socket.on("user-update", (data: any) => {
+    socket.on("user-update", (data: any) => {
       this.fetchActiveUser();
     });
 
-    this.socket.on("sign-out", (data: any) => {
+    socket.on("sign-out", (data: any) => {
       if (getLs("user") === data.data) {
         setLs("user", "");
         setLs("chatWith", "");
@@ -41,10 +37,6 @@ export default class Navbar extends React.Component<Props, State> {
       }
     });
   };
-
-  componentWillUnmount() {
-    this.socket.close();
-  }
 
   fetchActiveUser = () => {
     axios
@@ -57,6 +49,7 @@ export default class Navbar extends React.Component<Props, State> {
 
   logout = () => {
     const { history } = this.props;
+    socket.close();
     axios
       .post(`${API.backend}/login/sign-out`, {
         username: getUserLs().username,
